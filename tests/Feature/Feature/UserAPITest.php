@@ -10,7 +10,7 @@ use Tests\TestCase;
 /**
  * Test User API endpoints
  */
-class UserTest extends TestCase {
+class UserAPITest extends TestCase {
     /*
      * Test field validation of registration api endpoint
      */
