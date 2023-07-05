@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\WeatherAPIService;
 use Symfony\Component\HttpFoundation\Response;
+use App\Contracts\HALResourcesInterface;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Weather API Controller
  */
-class WeatherAPIController extends Controller {
+class WeatherAPIController extends Controller implements HALResourcesInterface {
+
     /**
      * Get historical weather forecast for the past 3 days for a location.
      * 
@@ -45,7 +48,7 @@ class WeatherAPIController extends Controller {
                     return WeatherAPIService::getForecast($location);
                 });
     }
-    
+
     /**
      * Helper function to generate the JSON responses necessary for this class.
      * 
@@ -84,5 +87,38 @@ class WeatherAPIController extends Controller {
                         'error' => 'Location not specified'
                             ], Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    /**
+     * Get HAL resources for this controller
+     * 
+     * @return type
+     */
+    public function getHALResources() {
+        $routes = Route::getRoutes();
+
+        $links = [
+            'self' => [
+                'href' => url(Route::current()->uri)
+            ],
+            'historical_forecast' => [
+                'href' => url($routes->getByName('WeatherAPIController.historicalForecast')->uri)
+            ],
+            'current' => [
+                'href' => url($routes->getByName('WeatherAPIController.current')->uri)
+            ],
+            'forecast' => [
+                'href' => url($routes->getByName('WeatherAPIController.forecast')->uri)
+            ]
+        ];
+
+        // Remove any links which are a duplicate of 'self' so the same uri is not listed twice.
+        $links = array_filter($links, function ($v, $k) use ($links) {
+            return $v['href'] !== $links['self']['href'] || $k === 'self';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        return [
+            '_links' => $links
+        ];
     }
 }

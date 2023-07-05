@@ -5,7 +5,9 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
-// WeatherAPI.com API Class
+/**
+ * WeatherAPI.com API Class
+ */
 class WeatherAPIService {
 
     // User-specific API Key
