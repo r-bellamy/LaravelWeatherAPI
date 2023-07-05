@@ -8,8 +8,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpFoundation\Response;
+use App\Contracts\HALResourcesInterface;
+use Illuminate\Support\Facades\Route;
 
-class JWTAuthController extends Controller {
+class JWTAuthController extends Controller implements HALResourcesInterface {
 
     public function register(Request $request) {
         // Validate data
@@ -22,7 +24,7 @@ class JWTAuthController extends Controller {
 
         // Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['error' => $validator->messages()], Response::HTTP_BAD_REQUEST);
         }
 
         // Request is valid, create new user
@@ -51,7 +53,7 @@ class JWTAuthController extends Controller {
 
         // Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['error' => $validator->messages()], Response::HTTP_BAD_REQUEST);
         }
 
         // Request is validated
@@ -61,14 +63,14 @@ class JWTAuthController extends Controller {
                 return response()->json([
                             'success' => false,
                             'message' => 'Login credentials are invalid.',
-                                ], 400);
+                                ], Response::HTTP_BAD_REQUEST);
             }
         } catch (JWTException $e) {
             return $credentials;
             return response()->json([
                         'success' => false,
                         'message' => 'Could not create token.',
-                            ], 500);
+                            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Token created, return with success response and jwt token
@@ -86,7 +88,7 @@ class JWTAuthController extends Controller {
 
         // Send failed response if request is not valid
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->messages()], 200);
+            return response()->json(['error' => $validator->messages()], Response::HTTP_BAD_REQUEST);
         }
 
         // Request is validated, do logout        
@@ -103,5 +105,38 @@ class JWTAuthController extends Controller {
                         'message' => 'Sorry, user cannot be logged out'
                             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * Get HAL resources for this controller
+     * 
+     * @return type
+     */
+    public function getHALResources() {
+        $routes = Route::getRoutes();
+
+        $links = [
+            'self' => [
+                'href' => url(Route::current()->uri)
+            ],
+            'register' => [
+                'href' => url($routes->getByName('JWTAuthController.register')->uri)
+            ],
+            'login' => [
+                'href' => url($routes->getByName('JWTAuthController.login')->uri)
+            ],
+            'logout' => [
+                'href' => url($routes->getByName('JWTAuthController.logout')->uri)
+            ]
+        ];
+
+        // Remove any links which are a duplicate of 'self' so the same uri is not listed twice.
+        $links = array_filter($links, function ($v, $k) use ($links) {
+            return $v['href'] !== $links['self']['href'] || $k === 'self';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        return [
+            '_links' => $links
+        ];
     }
 }

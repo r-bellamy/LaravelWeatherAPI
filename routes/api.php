@@ -16,37 +16,31 @@ use App\Http\Controllers\JWTAuthController;
   |
  */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::post('register', [JWTAuthController::class, 'register']);
-Route::post('login', [JWTAuthController::class, 'login']);
-
-Route::group(['middleware' => ['jwt.verify', 'mymiddleware']], function () {
-    Route::post('logout', [JWTAuthController::class, 'logout']);
-
-    // Get historical weather forecast
-    Route::get('/weather/historical', [WeatherAPIController::class, 'historicalForecast']);
-
-    // Get current weather
-    Route::get('/weather/current', [WeatherAPIController::class, 'current']);
-
-    // Get upcoming weather forecast
-    Route::get('/weather/forecast', [WeatherAPIController::class, 'forecast']);
-});
-
+// Public routes
 Route::group(['middleware' => ['hal.resources']], function () {
+    // Register route
+    Route::post('register', [JWTAuthController::class, 'register'])
+            ->name('JWTAuthController.register');
 
-// Get historical weather forecast
-    Route::get('/weather/historical', [WeatherAPIController::class, 'historicalForecast'])
-            ->name('WeatherAPIController.historicalForecast');
+    // Login route
+    Route::post('login', [JWTAuthController::class, 'login'])
+            ->name('JWTAuthController.login');
+});
 
-// Get current weather
-    Route::get('/weather/current', [WeatherAPIController::class, 'current'])
-            ->name('WeatherAPIController.current');
+// Authenticated user routes
+Route::group(['middleware' => ['jwt.verify', 'hal.resources']], function () {
+    // Logout route
+    Route::post('logout', [JWTAuthController::class, 'logout'])->name('JWTAuthController.logout');
 
-// Get upcoming weather forecast
-    Route::get('/weather/forecast', [WeatherAPIController::class, 'forecast'])
-            ->name('WeatherAPIController.forecast');
+    // Historical weather forecast route
+    Route::get('/weather/historical', [WeatherAPIController::class, 'historicalWeatherForecast'])
+            ->name('WeatherAPIController.historicalWeatherForecast');
+
+    // Current weather route
+    Route::get('/weather/current', [WeatherAPIController::class, 'currentWeather'])
+            ->name('WeatherAPIController.currentWeather');
+
+    // Weather forecast route
+    Route::get('/weather/forecast', [WeatherAPIController::class, 'weatherForecast'])
+            ->name('WeatherAPIController.weatherForecast');
 });

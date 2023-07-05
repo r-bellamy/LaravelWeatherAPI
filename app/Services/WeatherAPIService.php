@@ -19,7 +19,7 @@ class WeatherAPIService {
      * @param string $location Postcode or lat,lng
      * @return WeatherAPIServiceResult Returns result
      */
-    public static function getHistoricalForecast(string $location) {
+    public static function getHistoricalForecast(string $location) : WeatherAPIServiceResult {
         // Generate dates for the past 3 days to query the WeatherAPI.com API with.
         $dates = [
             strtotime("-3 day"),
@@ -101,7 +101,7 @@ class WeatherAPIService {
      * @param string $location Postcode or lat,lng
      * @return WeatherAPIServiceResult Returns result
      */
-    public static function getCurrentWeather(string $location) {
+    public static function getCurrentWeather(string $location) : WeatherAPIServiceResult {
         // Perform the API query.
         $urlQuery = http_build_query([
             'key' => self::API_KEY,
@@ -136,8 +136,6 @@ class WeatherAPIService {
 
         return $ret;
     }
-
-    // 
     
     /**
      * Get the 3 day forecast for a location.
@@ -145,7 +143,7 @@ class WeatherAPIService {
      * @param string $location Postcode or lat,lng
      * @return WeatherAPIServiceResult Returns result
      */
-    public static function getForecast(string $location) {
+    public static function getForecast(string $location) : WeatherAPIServiceResult{
         // Perform the API query.
         $urlQuery = http_build_query([
             'key' => self::API_KEY,
@@ -195,9 +193,9 @@ class WeatherAPIService {
      * returning an object containing the response and any error message.
      * 
      * @param string $url
-     * @return \App\Services\WeatherAPIServiceResult Contains the result and any error message.
+     * @return WeatherAPIServiceResult Contains the result and any error message.
      */
-    private static function getUrl(string $url) {
+    private static function getUrl(string $url) : WeatherAPIServiceResult {
         $client = new Client(); //GuzzleHttp\Client
         $error = NULL;
         $result = NULL;

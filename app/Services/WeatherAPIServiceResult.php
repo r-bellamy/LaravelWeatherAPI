@@ -10,7 +10,7 @@ class WeatherAPIServiceResult {
     private $error;
     private $result;
 
-    public function __construct($error, $result) {
+    public function _construct($error, $result) {
         $this->error = $error;
         $this->result = $result;
     }

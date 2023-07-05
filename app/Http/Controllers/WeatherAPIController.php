@@ -19,7 +19,7 @@ class WeatherAPIController extends Controller implements HALResourcesInterface {
      * @param Request $request
      * @return type
      */
-    public function historicalForecast(Request $request) {
+    public function historicalWeatherForecast(Request $request) {
         return $this->createJSONResponse($request, function ($location) {
                     return WeatherAPIService::getHistoricalForecast($location);
                 });
@@ -31,7 +31,7 @@ class WeatherAPIController extends Controller implements HALResourcesInterface {
      * @param Request $request
      * @return type
      */
-    public function current(Request $request) {
+    public function currentWeather(Request $request) {
         return $this->createJSONResponse($request, function ($location) {
                     return WeatherAPIService::getCurrentWeather($location);
                 });
@@ -43,7 +43,7 @@ class WeatherAPIController extends Controller implements HALResourcesInterface {
      * @param Request $request
      * @return type
      */
-    public function forecast(Request $request) {
+    public function weatherForecast(Request $request) {
         return $this->createJSONResponse($request, function ($location) {
                     return WeatherAPIService::getForecast($location);
                 });
@@ -55,7 +55,7 @@ class WeatherAPIController extends Controller implements HALResourcesInterface {
      * @param type $request Request object to extract the weather location from.
      * @param type $callback A callback function which passes the extracted location
      *                       to a function in the WeatherAPIService class which
-     *                       returns an instance of WeatherAPIServiceResult.
+     *                       must return an instance of WeatherAPIServiceResult.
      * @return type
      */
     private function createJSONResponse($request, $callback) {
@@ -101,14 +101,14 @@ class WeatherAPIController extends Controller implements HALResourcesInterface {
             'self' => [
                 'href' => url(Route::current()->uri)
             ],
-            'historical_forecast' => [
-                'href' => url($routes->getByName('WeatherAPIController.historicalForecast')->uri)
+            'historical_weather_forecast' => [
+                'href' => url($routes->getByName('WeatherAPIController.historicalWeatherForecast')->uri)
             ],
-            'current' => [
-                'href' => url($routes->getByName('WeatherAPIController.current')->uri)
+            'current_weather' => [
+                'href' => url($routes->getByName('WeatherAPIController.currentWeather')->uri)
             ],
-            'forecast' => [
-                'href' => url($routes->getByName('WeatherAPIController.forecast')->uri)
+            'weather_forecast' => [
+                'href' => url($routes->getByName('WeatherAPIController.weatherForecast')->uri)
             ]
         ];
 
